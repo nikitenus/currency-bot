@@ -43,6 +43,20 @@ test('нет кода валюты — возвращает подсказку �
   assert.equal(called, false);
 });
 
+test('код не из списка — явное сообщение, а не общая подсказка', async () => {
+  let called = false;
+  const provider = fakeProvider(async () => {
+    called = true;
+    return RATE_INFO;
+  });
+
+  const useCase = createGetRateUseCase({ ratesProvider: provider });
+  const reply = await useCase.handle('курс RUB');
+
+  assert.ok(reply.includes('RUB не поддерживается'));
+  assert.equal(called, false);
+});
+
 test('USD — базовая валюта, провайдер не вызывается', async () => {
   let called = false;
   const provider = fakeProvider(async () => {

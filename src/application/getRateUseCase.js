@@ -1,5 +1,5 @@
-import { detectCurrencyCode } from './detectCurrencyCode.js';
-import { QUOTE_CURRENCY, formatSameCurrency, formatRate, formatHint, formatRateError } from './rateFormatter.js';
+import { detectCurrencyCode, findCodeCandidate } from './detectCurrencyCode.js';
+import { QUOTE_CURRENCY, formatSameCurrency, formatRate, formatHint, formatUnknownCode, formatRateError } from './rateFormatter.js';
 
 /**
  * @param {{ ratesProvider: RatesProvider }} deps
@@ -8,7 +8,10 @@ export function createGetRateUseCase({ ratesProvider }) {
   async function handle(text) {
     const code = detectCurrencyCode(text);
 
-    if (!code) return formatHint();
+    if (!code) {
+      const candidate = findCodeCandidate(text);
+      return candidate ? formatUnknownCode(candidate) : formatHint();
+    }
     if (code === QUOTE_CURRENCY) return formatSameCurrency(code);
 
     try {

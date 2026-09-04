@@ -1,6 +1,8 @@
 import { buildApp } from './app.js';
+import { loadConfig } from './config/env.js';
 
-const app = buildApp();
+const config = loadConfig();
+const app = buildApp(config);
 
 const port = Number(process.env.PORT ?? 3000);
 const host = process.env.HOST ?? '0.0.0.0';

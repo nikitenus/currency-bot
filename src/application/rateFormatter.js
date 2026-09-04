@@ -14,6 +14,10 @@ export function formatHint() {
   return `Напишите трёхбуквенный код валюты, и я покажу её курс к USD. Например: курс EUR, GBP, JPY…`;
 }
 
+export function formatUnknownCode(code) {
+  return `Код ${code} не поддерживается. Доступные валюты: EUR, GBP, JPY, CHF, CNY, TRY и другие. Попробуйте ещё раз.`;
+}
+
 export function formatRateError(code) {
   return `Не удалось получить курс ${code}. Попробуйте ещё раз чуть позже.`;
 }
