@@ -40,9 +40,14 @@ C4-диаграммы: [context](./c4/01-context.md) → [container](./c4/02-con
 1. `IncomingMessage { chatId, text }` попадает в `getRateUseCase.handle(...)`.
 2. Детектор ищет трёхбуквенный код валюты: если кода нет или он не в списке — ответ-подсказка («напишите код валюты, например EUR»).
 3. `ratesProvider.getRate(code)` → Frankfurter `GET /v1/latest?from=<CODE>&to=USD` → `rates[USD]`.
-   - Особый случай: пользователь написал USD → отвечаем 1 USD = 1 USD (без запроса или с запросом — решим при реализации).
-4. `rateFormatter` собирает «1 EUR = 1.086 USD (на 2026-09-03)».
-5. `replySender.send(chatId, text)` → Bot API `sendMessage`.
+   - Особый случай: пользователь написал USD → отвечаем 1 USD = 1.0000 USD (без запроса к API).
+4. `rateFormatter` собирает «Курс EUR → USD на 2026-09-03: 1 EUR = 1.0869 USD».
+5. Use Case **возвращает** готовый текст; delivery отправляет его через порт `replySender` → Bot API `sendMessage`.
+
+## Тесты
+
+Чистые модули не зависят от сети: `npm test` (встроенный `node:test`) гоняет
+детектор кода и Use Case с фейковым `ratesProvider`.
 
 ## Ключевые решения
 
