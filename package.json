@@ -1,0 +1,19 @@
+{
+  "name": "tg-currency-bot",
+  "version": "1.0.0",
+  "description": "Telegram-бот: находит код валюты в тексте и отвечает её курсом к USD",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "node --env-file-if-exists=.env --watch src/server.js",
+    "start": "node --env-file-if-exists=.env src/server.js",
+    "bot:dev": "node --env-file-if-exists=.env src/poller.js",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "fastify": "^5.12.3"
+  }
+}
