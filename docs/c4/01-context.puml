@@ -1,0 +1,21 @@
+@startuml
+!include <C4/C4_Context>
+skinparam wrapWidth 200
+skinparam minClassWidth 140
+title System Context — Currency Bot
+
+Person(user, "Пользователь Telegram", "Пишет боту сообщения с кодом валюты, например «курс EUR»")
+
+System(bot, "Currency Bot", "Находит трёхбуквенный код валюты в тексте и отвечает её курсом к USD")
+
+System_Ext(telegram, "Telegram Bot API", "Мессенджер: доставляет обновления боту и сообщения пользователю")
+System_Ext(frankfurter, "Frankfurter API", "Открытый источник курсов валют ЕЦБ, GET /v1/latest")
+
+Rel(user, telegram, "Пишет сообщение в чат", "Telegram client")
+Rel(telegram, bot, "Доставляет update", "Webhook / getUpdates")
+Rel(bot, telegram, "Отправляет ответ", "Bot API sendMessage")
+Rel(bot, frankfurter, "Запрашивает курс", "HTTPS, GET /v1/latest")
+
+SHOW_LEGEND()
+
+@enduml

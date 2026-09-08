@@ -3,13 +3,13 @@
 Задание: Telegram-бот находит код валюты во входящем тексте и отвечает её курсом к USD.
 Курсы: https://api.frankfurter.dev/v1/latest · Бэкенд: Fastify · Деплой: Vercel.
 
-C4-диаграммы: [context](./c4/01-context.md) → [container](./c4/02-container.md) → [components](./c4/03-components.md).
+C4-диаграммы (PlantUML): [context](./c4/01-context.puml) → [container](./c4/02-container.puml) → [components](./c4/03-components.puml).
 
 ## План структуры кода (JS)
 
 ```
 .
-├── docs/c4/                  # C4-диаграммы (Mermaid)
+├── docs/c4/                  # C4-диаграммы (PlantUML)
 ├── api/index.js              # вход для Vercel: Fastify-приложение как serverless-функция
 ├── src/
 │   ├── server.js             # точка входа: локально — poller, на Vercel — экспорт handler

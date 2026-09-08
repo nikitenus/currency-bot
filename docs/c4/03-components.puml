@@ -1,0 +1,50 @@
+@startuml
+!include <C4/C4_Component>
+skinparam wrapWidth 200
+skinparam minClassWidth 140
+title Components — Currency Bot
+
+System_Ext(telegram, "Telegram Bot API", "Webhook / sendMessage / getUpdates")
+System_Ext(frankfurter, "Frankfurter API", "GET /v1/latest")
+
+Container_Boundary(webapp, "Web App (Fastify)") {
+    Component(webhook, "Webhook Controller", "Fastify route", "POST /webhook/telegram: оркестрирует сценарий обработки update")
+    Component(parser, "Update Parser", "Pure JS", "Telegram update → IncomingMessage { chatId, text }")
+    Component(usecase, "Get Rate Use Case", "Application", "Сценарий: детекция кода → курс → текст ответа. Не знает про HTTP и Telegram")
+    Component(detector, "Detect Currency Code", "Application", "Ищет трёхбуквенный код валюты в тексте")
+    Component(formatter, "Rate Formatter", "Application", "Собирает текст ответа (курс, подсказка, ошибка)")
+    Component(currency, "Currency Code", "Domain", "Валидация кода + список поддерживаемых валют (SUPPORTED_CURRENCIES)")
+    Component(provider, "Frankfurter Rates Provider", "Infrastructure adapter", "Реализация порта RatesProvider: HTTP к Frankfurter")
+    Component(sender, "Telegram Sender", "Infrastructure adapter", "Реализация порта ReplySender: sendMessage через Bot API")
+    Component(composition, "Composition Root", "app.js / composition.js", "Ручной DI: собирает Use Case и адаптеры")
+}
+
+Container_Boundary(poll, "Dev Poller (Node.js)") {
+    Component(pollcomp, "Poller", "Long polling loop", "getUpdates с offset + тот же Use Case и Sender")
+}
+
+Rel(telegram, webhook, "POST /webhook/telegram", "update (JSON)")
+Rel(webhook, parser, "parseUpdate(update)")
+Rel(webhook, usecase, "handle(text)")
+Rel(webhook, sender, "send(chatId, text)")
+
+Rel(telegram, pollcomp, "getUpdates (long polling)", "HTTPS/JSON")
+Rel(pollcomp, parser, "parseUpdate(update)")
+Rel(pollcomp, usecase, "handle(text)")
+Rel(pollcomp, sender, "send(chatId, text)")
+
+Rel(usecase, detector, "detectCurrencyCode / findCodeCandidate")
+Rel(usecase, formatter, "formatRate / formatHint / …")
+Rel(usecase, provider, "getRate(code, quote)", "порт RatesProvider")
+Rel(detector, currency, "toCurrencyCode / isSupportedCurrency")
+
+Rel(sender, telegram, "POST sendMessage", "HTTPS/JSON")
+Rel(provider, frankfurter, "GET /v1/latest?from=CODE&to=USD", "HTTPS/JSON")
+
+Rel(composition, usecase, "внедряет ratesProvider", "DI")
+Rel(composition, sender, "внедряет botToken", "DI")
+Rel(composition, provider, "создаёт", "DI")
+
+SHOW_LEGEND()
+
+@enduml
