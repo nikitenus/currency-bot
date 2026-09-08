@@ -1,0 +1,30 @@
+@startuml
+!include <C4/C4_Container>
+skinparam wrapWidth 200
+skinparam minClassWidth 140
+title Container — Currency Bot
+
+Person(user, "Пользователь Telegram", "Пишет сообщения с кодом валюты")
+
+System_Ext(telegram, "Telegram Bot API", "Доставляет обновления и сообщения боту")
+System_Ext(frankfurter, "Frankfurter API", "Курсы валют ЕЦБ, GET /v1/latest")
+
+System_Boundary(prod, "Продакшн — Vercel") {
+    Container(webapp, "Web App", "Fastify + Node.js, serverless-функция", "Единое приложение: webhook-маршрут, Use Case, адаптеры. Живёт один запрос.")
+}
+
+System_Boundary(dev, "Локальная разработка") {
+    Container(poller, "Dev Poller", "Node.js процесс (src/poller.js)", "Long polling через getUpdates; переиспользует тот же Use Case и адаптеры, что и Web App.")
+}
+
+Rel(user, telegram, "Пишет сообщение в чат", "Telegram client")
+Rel(telegram, webapp, "Webhook: POST /webhook/telegram", "HTTPS/JSON")
+Rel(webapp, telegram, "Ответ: Bot API sendMessage", "HTTPS/JSON")
+Rel(webapp, frankfurter, "GET /v1/latest?from=CODE&to=USD", "HTTPS/JSON")
+Rel(telegram, poller, "getUpdates (long polling)", "HTTPS/JSON")
+Rel(poller, telegram, "Ответ: Bot API sendMessage", "HTTPS/JSON")
+Rel(poller, frankfurter, "GET /v1/latest?from=CODE&to=USD", "HTTPS/JSON")
+
+SHOW_LEGEND()
+
+@enduml
