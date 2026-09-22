@@ -9,7 +9,11 @@ export function buildApp({ botToken, supabaseUrl, supabaseKey }) {
 
   registerWebhook(app, bot);
 
-  app.get('/health', async () => ({ status: 'ok' }));
+  app.get('/health', async () => ({
+    status: 'ok',
+    supabase: Boolean(supabaseUrl && supabaseKey),
+    commit: process.env.VERCEL_GIT_COMMIT_SHA?.slice(0, 7) ?? null,
+  }));
 
   return app;
 }
