@@ -7,5 +7,10 @@ export function parseUpdate(update) {
     return null;
   }
 
-  return { chatId, text: text.trim() };
+  return {
+    chatId,
+    text: text.trim(),
+    firstName: message?.from?.first_name ?? null,
+    lastName: message?.from?.last_name ?? null,
+  };
 }

@@ -1,0 +1,7 @@
+project_id = "tg-currency-bot"
+
+[functions.clients]
+verify_jwt = false
+
+[functions.messages]
+verify_jwt = false

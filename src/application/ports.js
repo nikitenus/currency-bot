@@ -24,4 +24,11 @@
  * @typedef {Object} ReplySender
  */
 
+/**
+ * Порт хранилища диалогов (кто писал и что). Контракт:
+ * record({ chatId, username, firstName, text, reply }) -> Promise<void>
+ * Используется delivery-слоем, не Use Case.
+ * @typedef {Object} ConversationStore
+ */
+
 export {};
