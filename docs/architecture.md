@@ -26,9 +26,15 @@ C4-диаграммы (PlantUML): [context](./c4/01-context.puml) → [container
 │   │   └── rateFormatter.js       # текст ответа
 │   ├── infrastructure/
 │   │   ├── frankfurter/ratesProvider.js  # HTTP к api.frankfurter.dev
+│   │   ├── supabase/store.js             # запись clients/messages в Supabase
 │   │   └── telegram/sender.js            # sendMessage через Bot API
 │   └── domain/
 │       └── currencyCode.js       # валидация кода + список поддерживаемых
+├── supabase/
+│   ├── schema.sql                # таблицы clients и messages
+│   └── functions/
+│       ├── clients/index.ts      # GET все клиенты, сортировка last_message_at desc
+│       └── messages/index.ts     # GET все сообщения, сортировка created_at desc
 ├── vercel.json               # настройка деплоя Vercel
 ├── .env                      # локально: BOT_TOKEN (в gitignore)
 ├── .env.example
@@ -57,7 +63,7 @@ C4-диаграммы (PlantUML): [context](./c4/01-context.puml) → [container
 | Как разрабатывать локально | **Dev Poller** (long polling) | не нужен публичный URL; тот же Use Case, что и у webhook |
 | Слои | delivery → application → domain; infrastructure реализует порты | чистая архитектура: Use Case не знает ни про Fastify, ни про Frankfurter, ни про Telegram |
 | DI | ручной, в одном месте (composition root, `app.js`) | проект маленький, фреймворки DI избыточны |
-| Состояние | stateless, без БД | Frankfurter обновляет курсы раз в день, БД не нужна; webhook-режим сам отслеживает доставку |
+| Состояние | Supabase (Postgres) как хранилище диалогов | пишем клиентов и сообщения через порт `ConversationStore`; сам Use Case остаётся stateless |
 | Код валюты | 3 буквы ISO из списка `/v1/currencies` | детектор не доверяет любому тексту, только валидным кодам |
 | Секрет webhook | заголовок `X-Telegram-Bot-Api-Secret-Token` | Vercel-URL публичный; секрет не даёт слать в бота «фейковые» обновления |
 

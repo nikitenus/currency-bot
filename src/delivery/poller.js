@@ -1,7 +1,7 @@
 import { TELEGRAM_API_URL } from '../infrastructure/telegram/sender.js';
 import { parseUpdate } from './updateParser.js';
 
-export function createPoller({ botToken, getRateUseCase, replySender, log = console }) {
+export function createPoller({ botToken, getRateUseCase, replySender, conversations, log = console }) {
   let offset = 0;
 
   async function pollOnce() {
@@ -23,6 +23,12 @@ export function createPoller({ botToken, getRateUseCase, replySender, log = cons
       const replyText = await getRateUseCase.handle(incoming.text);
       await replySender.send(incoming.chatId, replyText);
       log.info(`[poller] → ${replyText}`);
+
+      try {
+        await conversations.record({ ...incoming, reply: replyText });
+      } catch (err) {
+        log.error(`[supabase] ${err.message}`);
+      }
     }
   }
 
